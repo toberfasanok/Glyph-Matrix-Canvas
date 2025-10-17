@@ -204,6 +204,36 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                fun moveCells(dx: Int, dy: Int) {
+                    val newArr = BooleanArray(matrixSize * matrixSize) { false }
+
+                    for (r in 0 until matrixSize) {
+                        for (c in 0 until matrixSize) {
+                            val i = r * matrixSize + c
+                            if (!mask[i]) continue
+                            if (!cells[i].value) continue
+
+                            val newR = r + dy
+                            val newC = c + dx
+
+                            if (newR in 0 until matrixSize && newC in 0 until matrixSize) {
+                                val newI = newR * matrixSize + newC
+                                if (mask[newI]) {
+                                    newArr[newI] = true
+                                }
+                            }
+                        }
+                    }
+
+                    for (i in 0 until matrixSize * matrixSize) {
+                        if (mask[i]) {
+                            cells[i].value = newArr[i]
+                        } else {
+                            cells[i].value = false
+                        }
+                    }
+                }
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
                     Column(
                         modifier = Modifier
@@ -217,8 +247,16 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .padding(horizontal = 24.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            Button(onClick = {
+                                for (i in 0 until matrixSize * matrixSize) {
+                                    if (mask[i]) cells[i].value = false
+                                }
+                            }) {
+                                Text("Clear")
+                            }
+
                             Button(
                                 modifier = Modifier.padding(top = 12.dp),
                                 onClick = {
@@ -340,18 +378,20 @@ class MainActivity : ComponentActivity() {
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Button(onClick = {
-                                    saveLauncher.launch("glyph_${System.currentTimeMillis()}.png")
-                                }) {
-                                    Text("Save")
+                                Button(onClick = { moveCells(-1, 0) }) {
+                                    Text("Left")
                                 }
 
-                                Button(onClick = {
-                                    for (i in 0 until matrixSize * matrixSize) {
-                                        if (mask[i]) cells[i].value = false
-                                    }
-                                }) {
-                                    Text("Clear")
+                                Button(onClick = { moveCells(1, 0) }) {
+                                    Text("Right")
+                                }
+
+                                Button(onClick = { moveCells(0, -1) }) {
+                                    Text("Up")
+                                }
+
+                                Button(onClick = { moveCells(0, 1) }) {
+                                    Text("Down")
                                 }
                             }
 
@@ -364,6 +404,12 @@ class MainActivity : ComponentActivity() {
                                     loadLauncher.launch(arrayOf("image/*"))
                                 }) {
                                     Text("Load")
+                                }
+
+                                Button(onClick = {
+                                    saveLauncher.launch("glyph_${System.currentTimeMillis()}.png")
+                                }) {
+                                    Text("Save")
                                 }
 
                                 Button(onClick = {
