@@ -20,11 +20,11 @@ class GlyphMatrixService : Service() {
 
     private var glyphMatrixManager: GlyphMatrixManager? = null
     private var glyphMatrixManagerCallback: GlyphMatrixManager.Callback? = null
-    private var initialized = false
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private var clearRunnable: Runnable? = null
 
+    private var initialized = false
     private val timeout = 10000L
 
     inline fun <reified T : Parcelable> Intent?.parcelableExtra(name: String): T? {
@@ -127,7 +127,7 @@ class GlyphMatrixService : Service() {
             try {
                 glyphMatrixManager?.closeAppMatrix()
             } catch (e: Exception) {
-                Log.e(tag, "Failed to stop glyph: $e")
+                Log.e(tag, "Failed to close glyph matrix: $e")
             } finally {
                 clearRunnable = null
             }

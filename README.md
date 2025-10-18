@@ -9,7 +9,7 @@ This is a tool for the Nothing Phone 3 Glyph Matrix
 ## Usage
 
 Download the APK (app.apk) and
-- Draw
+- Draw Glyphs
 - Display Glyphs on the Glyph Matrix
 - Save Glyphs
 - Load Glyphs

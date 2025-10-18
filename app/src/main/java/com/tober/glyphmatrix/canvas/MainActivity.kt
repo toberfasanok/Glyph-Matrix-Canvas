@@ -24,10 +24,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -249,46 +259,44 @@ class MainActivity : ComponentActivity() {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Button(onClick = {
+                            IconButton(onClick = {
                                 for (i in 0 until matrixSize * matrixSize) {
                                     if (mask[i]) cells[i].value = false
                                 }
                             }) {
-                                Text("Clear")
+                                Icon(imageVector = Icons.Filled.Delete, contentDescription = "Delete")
                             }
 
-                            Button(
-                                modifier = Modifier.padding(top = 12.dp),
-                                onClick = {
-                                    try {
-                                        val bitmap = createBitmap(matrixSize, matrixSize, Bitmap.Config.ARGB_8888)
-                                        val on = 0xFFFFFFFF.toInt()
-                                        val off = 0x00000000
+                            IconButton(onClick = {
+                                try {
+                                    val bitmap = createBitmap(matrixSize, matrixSize, Bitmap.Config.ARGB_8888)
+                                    val on = 0xFFFFFFFF.toInt()
+                                    val off = 0x00000000
 
-                                        for (r in 0 until matrixSize) {
-                                            for (c in 0 until matrixSize) {
-                                                val i = r * matrixSize + c
+                                    for (r in 0 until matrixSize) {
+                                        for (c in 0 until matrixSize) {
+                                            val i = r * matrixSize + c
 
-                                                val px = when {
-                                                    !mask[i] -> off
-                                                    cells[i].value -> on
-                                                    else -> off
-                                                }
-
-                                                bitmap[c, r] = px
+                                            val px = when {
+                                                !mask[i] -> off
+                                                cells[i].value -> on
+                                                else -> off
                                             }
-                                        }
 
-                                        val intent = Intent(this@MainActivity, GlyphMatrixService::class.java).apply {
-                                            putExtra(Constants.GLYPH_EXTRA_BITMAP, bitmap)
+                                            bitmap[c, r] = px
                                         }
-                                        startService(intent)
-                                    } catch (e: Exception) {
-                                        Log.e(tag, "Failed to display glyph: $e")
-                                        toast("Failed to display glyph")
                                     }
-                            } ) {
-                                Text(text = "Display Glyph")
+
+                                    val intent = Intent(this@MainActivity, GlyphMatrixService::class.java).apply {
+                                        putExtra(Constants.GLYPH_EXTRA_BITMAP, bitmap)
+                                    }
+                                    startService(intent)
+                                } catch (e: Exception) {
+                                    Log.e(tag, "Failed to display glyph: $e")
+                                    toast("Failed to display glyph")
+                                }
+                            }) {
+                                Icon(imageVector = Icons.Filled.Visibility, contentDescription = "Display")
                             }
                         }
 
@@ -378,20 +386,16 @@ class MainActivity : ComponentActivity() {
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Button(onClick = { moveCells(-1, 0) }) {
-                                    Text("Left")
+                                IconButton(onClick = {
+                                    saveLauncher.launch("glyph_${System.currentTimeMillis()}.png")
+                                }) {
+                                    Icon(imageVector = Icons.Filled.Save, contentDescription = "Save")
                                 }
 
-                                Button(onClick = { moveCells(1, 0) }) {
-                                    Text("Right")
-                                }
-
-                                Button(onClick = { moveCells(0, -1) }) {
-                                    Text("Up")
-                                }
-
-                                Button(onClick = { moveCells(0, 1) }) {
-                                    Text("Down")
+                                IconButton(onClick = {
+                                    loadLauncher.launch(arrayOf("image/*"))
+                                }) {
+                                    Icon(imageVector = Icons.Filled.FolderOpen, contentDescription = "Load")
                                 }
                             }
 
@@ -400,24 +404,28 @@ class MainActivity : ComponentActivity() {
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Button(onClick = {
-                                    loadLauncher.launch(arrayOf("image/*"))
-                                }) {
-                                    Text("Load")
+                                IconButton(onClick = { moveCells(-1, 0) }) {
+                                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Left")
                                 }
 
-                                Button(onClick = {
-                                    saveLauncher.launch("glyph_${System.currentTimeMillis()}.png")
-                                }) {
-                                    Text("Save")
+                                IconButton(onClick = { moveCells(1, 0) }) {
+                                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Right")
                                 }
 
-                                Button(onClick = {
+                                IconButton(onClick = { moveCells(0, -1) }) {
+                                    Icon(imageVector = Icons.Filled.ArrowUpward, contentDescription = "Up")
+                                }
+
+                                IconButton(onClick = { moveCells(0, 1) }) {
+                                    Icon(imageVector = Icons.Filled.ArrowDownward, contentDescription = "Down")
+                                }
+
+                                IconButton(onClick = {
                                     for (i in 0 until matrixSize * matrixSize) {
                                         if (mask[i]) cells[i].value = !cells[i].value
                                     }
                                 }) {
-                                    Text("Reverse")
+                                    Icon(imageVector = Icons.Filled.SwapHoriz, contentDescription = "Reverse")
                                 }
                             }
                         }
